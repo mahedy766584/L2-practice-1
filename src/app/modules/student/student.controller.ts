@@ -1,21 +1,53 @@
-/* eslint-disable no-console */
-import { Request, Response } from 'express'
-import { studentServices } from './student.service'
+import { studentServices } from './student.service';
+import sendResponse from '../../utils/sendResponse';
+import status from 'http-status';
+import catchAsync from '../../utils/catchAsync';
 
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    const { student: studentData } = req.body
-    const result = await studentServices.createStudentIntoDB(studentData)
-    res.status(200).json({
-      success: true,
-      message: 'Student is created successfully',
-      data: result,
-    })
-  } catch (err) {
-    console.log(err)
-  }
-}
+const getAllStudents = catchAsync(async (req, res) => {
+  const result = await studentServices.getAllStudents(req.query);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'Students are retrieved successfully',
+    data: result,
+  });
+});
+
+const getSingleStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
+  const result = await studentServices.getSingleStudent(studentId);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'Students are retrieved successfully',
+    data: result,
+  });
+});
+const deleteStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
+  const result = await studentServices.deleteStudentFromDB(studentId);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'Students are deleted successfully',
+    data: result,
+  });
+});
+const updateStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
+  const { student } = req.body;
+  const result = await studentServices.updateSingleStudent(studentId, student);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'Students is updated successfully',
+    data: result,
+  });
+});
 
 export const studentController = {
-  createStudent,
-}
+  getAllStudents,
+  getSingleStudent,
+  deleteStudent,
+  updateStudent,
+};
